@@ -94,15 +94,14 @@ function calcBestNiu(hand) {
 
 function multiplier(result) {
   if (!result) return 1;
-  if (result.type === "five-face")   return 3;
-  if (result.type === "spade-a-pair") return result.isPair ? 4 : 5; // shouldn't happen but safe
-  if (result.type === "spade-a-niu") return 5;  // 黑桃A + JQK → 5×
-  if (result.isPair && result.isSpadeANiu) return 4; // 黑桃A + 对子 → 4×
-  if (result.type === "niu-niu-pair") return 4; // 牛牛 + 对子 → 4×  (kept from before)
-  if (result.type === "niu-niu")     return 2;
-  if (result.isPair)                 return 3;  // 对子牛 → 3× (updated from 2×)
-  if (result.value >= 7)             return 2;
-  return 1;
+  if (result.type === "five-face")    return 3;
+  if (result.type === "spade-a-pair") return 4; // 对子A → 4×
+  if (result.type === "spade-a-niu")  return 5; // JQK + 黑桃A → 5×
+  if (result.type === "niu-niu-pair") return 3; // 牛牛 + 对子 → 3×
+  if (result.type === "niu-niu")      return 2; // 牛10 → 2×
+  if (result.isPair)                  return 3; // 对子 → 3×
+  if (result.value === 9)             return 2; // 牛9 → 2×
+  return 1;                                     // 大小 → 1×
 }
 
 function calcWin(playerResult, dealerResult, bet) {
@@ -118,13 +117,13 @@ function calcWin(playerResult, dealerResult, bet) {
 function multiplierFull(result) {
   if (!result) return 1;
   if (result.type === "five-face")    return 3;
-  if (result.type === "spade-a-pair") return 4; // 黑桃A + 对子牛 → 4×
-  if (result.type === "spade-a-niu")  return 5; // 黑桃A + JQK牛 → 5×
-  if (result.type === "niu-niu-pair") return 4;
-  if (result.type === "niu-niu")      return 2;
-  if (result.isPair)                  return 3; // 对子牛 → 3×
-  if (result.value >= 7)              return 2;
-  return 1;
+  if (result.type === "spade-a-pair") return 4; // 对子A → 4×
+  if (result.type === "spade-a-niu")  return 5; // JQK + 黑桃A → 5×
+  if (result.type === "niu-niu-pair") return 3; // 牛牛 + 对子 → 3×
+  if (result.type === "niu-niu")      return 2; // 牛10 → 2×
+  if (result.isPair)                  return 3; // 对子 → 3×
+  if (result.value === 9)             return 2; // 牛9 → 2×
+  return 1;                                     // 大小 → 1×
 }
 
 // ─── Translations & Label Helper ─────────────────────────────────────────────
@@ -174,10 +173,10 @@ const T = {
     logWon: n => `赢 RM${n}`, logLost: n => `输 RM${n}`, logTie: '平局',
     logMissed: d => `（少赚/多亏 RM${d}）`,
     tiePayout: '平',
-    rules: '玩法：点击选3张牌使点数之和为10的倍数 → 剩余2张个位即牛数。牛7+/牛牛 ×2，五花牛 ×3。',
-    rulesPair: '🎯 对子牛 ×3。',
-    rulesSpade: '♠A 凑牛含JQK → ×5；♠A+对子牛 → ×4。',
-    rulesSwap: '★ 凑牛时3↔6可互换（对子牛除外）。',
+    rules: '玩法：选3张和为10的倍数 → 剩余2张个位为牛数。牛9/牛10 ×2，对子 ×3，对子A ×4，JQK+♠A ×5，其余 ×1。',
+    rulesPair: '',
+    rulesSpade: '',
+    rulesSwap: '★ 凑牛时3↔6可互换。',
   },
   en: {
     chips: 'Chips', pl: 'P/L', currentBet: 'Bet',
@@ -206,10 +205,10 @@ const T = {
     logWon: n => `Won RM${n}`, logLost: n => `Lost RM${n}`, logTie: 'Tie',
     logMissed: d => `(missed RM${d})`,
     tiePayout: 'Tie',
-    rules: 'How to play: Select 3 cards whose sum is a multiple of 10 → remaining 2 cards (units digit) = Niu value. Niu 7+/Niu Niu ×2, Five Face ×3.',
-    rulesPair: '🎯 Pair Niu ×3.',
-    rulesSpade: '♠A with JQK → ×5; ♠A+Pair Niu → ×4.',
-    rulesSwap: '★ 3↔6 swap allowed when forming combos (except Pair Niu).',
+    rules: 'How to play: Select 3 cards summing to a multiple of 10 → remaining 2 cards (units) = Niu value. Niu 9/Niu 10 ×2, Pair ×3, Pair Ace ×4, JQK+♠A ×5, others ×1.',
+    rulesPair: '',
+    rulesSpade: '',
+    rulesSwap: '★ 3↔6 swap allowed when forming combos.',
   },
 };
 
@@ -326,7 +325,7 @@ export default function NiuNiuGame() {
   const [coins, setCoins] = useState(INIT_COINS);
   const [bet, setBet] = useState(25);
   const [phase, setPhase] = useState("bet"); // bet | select | result
-  const [hands, setHands] = useState({ player:[], dealer:[], cpu1:[], cpu2:[], cpu3:[] });
+  const [hands, setHands] = useState({ player:[], dealer:[] });
   const [npcResults, setNpcResults] = useState({});
   const [selectedIdxs, setSelectedIdxs] = useState([]);
   const [playerResult, setPlayerResult] = useState(null);
@@ -344,9 +343,6 @@ export default function NiuNiuGame() {
     setHands({
       player: deck.slice(0,5),
       dealer: deck.slice(5,10),
-      cpu1:   deck.slice(10,15),
-      cpu2:   deck.slice(15,20),
-      cpu3:   deck.slice(20,25),
     });
     setSelectedIdxs([]);
     setPlayerResult(null);
@@ -373,7 +369,7 @@ export default function NiuNiuGame() {
 
     // Evaluate NPC hands
     const npcR = {};
-    ["dealer","cpu1","cpu2","cpu3"].forEach(key => { npcR[key] = calcBestNiu(hands[key]); });
+    ["dealer"].forEach(key => { npcR[key] = calcBestNiu(hands[key]); });
     setNpcResults(npcR);
 
     let selected;
@@ -524,14 +520,6 @@ export default function NiuNiuGame() {
           <>
             <NpcRow name={tx.dealer} hand={hands.dealer} result={npcResults.dealer}
               revealed={phase === "result"} isDealer lang={lang} />
-            {["cpu1","cpu2","cpu3"].map((key, i) => (
-              <NpcRow key={key} name={`${tx.cpu}${i+1}`} hand={hands[key]}
-                result={npcResults[key]} revealed={phase === "result"} lang={lang}
-                winAmount={phase === "result"
-                  ? calcWin(npcResults[key]||{value:0,type:"no-niu"}, npcResults.dealer||{value:0,type:"no-niu"}, 25)
-                  : undefined}
-              />
-            ))}
           </>
         )}
 
