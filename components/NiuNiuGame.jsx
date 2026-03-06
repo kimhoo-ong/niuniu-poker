@@ -50,17 +50,16 @@ function evalSelection(hand, tripleIdxs) {
   }
   if (!foundTriple) return null;
 
-  const tripleCards = tripleIdxs.map(idx => hand[idx]);
   const rest = hand.filter((_, idx) => !tripleIdxs.includes(idx));
   const isPair = rest[0].rank === rest[1].rank;
   const sum2 = (cardValue(rest[0].rank) + cardValue(rest[1].rank)) % 10;
   const niuVal = sum2 === 0 ? 10 : sum2;
   const swapNote = used3as6 ? "★" : "";
 
-  // 黑桃A牛: triple must contain 黑桃A AND at least one JQK
-  const tripleHasSpadeA = tripleCards.some(c => c.rank === "A" && c.suit === "♠");
-  const tripleHasJQK    = tripleCards.some(c => isFaceCard(c.rank));
-  const isSpadeANiu = tripleHasSpadeA && tripleHasJQK;
+  // 5×: remaining 2 cards must be ♠A + one JQK
+  const restHasSpadeA = rest.some(c => c.rank === "A" && c.suit === "♠");
+  const restHasJQK    = rest.some(c => isFaceCard(c.rank));
+  const isSpadeANiu = restHasSpadeA && restHasJQK;
 
   if (niuVal === 10) {
     if (isSpadeANiu && isPair)  return { type:"spade-a-pair",   value:10, label:`牛牛(黑桃A+对子)${swapNote}`, tripleIdx:tripleIdxs, isPair, isSpadeANiu, used3as6 };
