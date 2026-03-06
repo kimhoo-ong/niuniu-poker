@@ -127,6 +127,92 @@ function multiplierFull(result) {
   return 1;
 }
 
+// ─── Translations & Label Helper ─────────────────────────────────────────────
+function getLabel(result, lang) {
+  if (!result) return '';
+  const zh = lang !== 'en';
+  const sw = result.used3as6 ? '★' : '';
+  if (result.type === 'five-face') return zh ? '五花牛' : 'Five Face';
+  if (result.type === 'no-niu')   return zh ? '没牛' : 'No Niu';
+  const niuPart = result.value === 10
+    ? (zh ? '牛牛' : 'Niu Niu')
+    : (zh ? `牛${result.value}` : `Niu ${result.value}`);
+  if (result.isSpadeANiu && result.isPair)
+    return `${niuPart}(${zh ? '黑桃A+对子' : '♠A+Pair'})${sw}`;
+  if (result.isSpadeANiu)
+    return `${niuPart}(${zh ? '黑桃A' : '♠A'})${sw}`;
+  if (result.isPair)
+    return `${niuPart}(${zh ? '对子' : 'Pair'})${sw}`;
+  return `${niuPart}${sw}`;
+}
+
+const T = {
+  zh: {
+    chips: '筹码', pl: '总盈亏', currentBet: '本局下注',
+    selectBet: '选择下注金额', deal: '发牌！',
+    dealer: '庄家', cpu: '电脑',
+    yourHand: '你的手牌',
+    selectedCount: n => `已选 ${n}/3 张`,
+    fiveFaceNotice: '🌟 五花牛！无需选牌，直接确认！',
+    confirm: '确认开牌 👊', noNiuBtn: '没牛 🐄',
+    won: n => `🎉 赢了 RM${n}！`,
+    lost: n => `😞 输了 RM${n}`,
+    tie: '🤝 平局',
+    yourChoice: '👤 你的选择',
+    bestComboLabel: sub => sub ? '💡 最佳组合' : '✅ 最佳组合',
+    suboptimalNote: d => `最佳组合比你的选择 多 RM${d}`,
+    optimalNote: '🎯 恭喜！你选了最佳组合！',
+    dealerPrefix: '庄家：',
+    times: n => `×${n}倍`,
+    playAgain: '再来一局', resetChips: '重置筹码',
+    history: '历史记录',
+    errSelectThree: '请选择3张牌来凑牛，或点「没牛」提交！',
+    errInvalidCombo: sum => `❌ 选的3张点数之和为 ${sum}（个位 ${sum%10}），不是10的倍数，凑不了牛！请重新选择。`,
+    previewPartial: s => `当前点数和：${s}（个位 ${s%10}）`,
+    previewValid: label => `✅ 有效！组合为 ${label}`,
+    previewInvalid: s => `❌ 点数和个位为 ${s%10}，不是0，无法凑牛`,
+    logWon: n => `赢 RM${n}`, logLost: n => `输 RM${n}`, logTie: '平局',
+    logMissed: d => `（少赚/多亏 RM${d}）`,
+    tiePayout: '平',
+    rules: '玩法：点击选3张牌使点数之和为10的倍数 → 剩余2张个位即牛数。牛7+/牛牛 ×2，五花牛 ×3。',
+    rulesPair: '🎯 对子牛 ×3。',
+    rulesSpade: '♠A 凑牛含JQK → ×5；♠A+对子牛 → ×4。',
+    rulesSwap: '★ 凑牛时3↔6可互换（对子牛除外）。',
+  },
+  en: {
+    chips: 'Chips', pl: 'P/L', currentBet: 'Bet',
+    selectBet: 'Select Bet Amount', deal: 'Deal!',
+    dealer: 'Dealer', cpu: 'CPU',
+    yourHand: 'Your Hand',
+    selectedCount: n => `Selected ${n}/3`,
+    fiveFaceNotice: '🌟 Five Face! No selection needed, confirm!',
+    confirm: 'Confirm 👊', noNiuBtn: 'No Niu 🐄',
+    won: n => `🎉 Won RM${n}!`,
+    lost: n => `😞 Lost RM${n}`,
+    tie: '🤝 Tie',
+    yourChoice: '👤 Your Choice',
+    bestComboLabel: sub => sub ? '💡 Best Combo' : '✅ Best Combo',
+    suboptimalNote: d => `Best combo beats yours by RM${d}`,
+    optimalNote: '🎯 You picked the best combo!',
+    dealerPrefix: 'Dealer: ',
+    times: n => `×${n}`,
+    playAgain: 'Play Again', resetChips: 'Reset Chips',
+    history: 'History',
+    errSelectThree: "Please select 3 cards, or click 'No Niu'!",
+    errInvalidCombo: sum => `❌ Sum is ${sum} (units: ${sum%10}), not a multiple of 10! Try again.`,
+    previewPartial: s => `Sum: ${s} (units: ${s%10})`,
+    previewValid: label => `✅ Valid! Combo: ${label}`,
+    previewInvalid: s => `❌ Units digit is ${s%10} (not 0), invalid`,
+    logWon: n => `Won RM${n}`, logLost: n => `Lost RM${n}`, logTie: 'Tie',
+    logMissed: d => `(missed RM${d})`,
+    tiePayout: 'Tie',
+    rules: 'How to play: Select 3 cards whose sum is a multiple of 10 → remaining 2 cards (units digit) = Niu value. Niu 7+/Niu Niu ×2, Five Face ×3.',
+    rulesPair: '🎯 Pair Niu ×3.',
+    rulesSpade: '♠A with JQK → ×5; ♠A+Pair Niu → ×4.',
+    rulesSwap: '★ 3↔6 swap allowed when forming combos (except Pair Niu).',
+  },
+};
+
 // ─── Card Component ───────────────────────────────────────────────────────────
 function Card({ card, faceDown=false, state="normal", onClick, delay=0, small=false }) {
   const [visible, setVisible] = useState(false);
@@ -178,7 +264,7 @@ function Card({ card, faceDown=false, state="normal", onClick, delay=0, small=fa
 }
 
 // ─── Badge ────────────────────────────────────────────────────────────────────
-function Badge({ result }) {
+function Badge({ result, lang = "zh" }) {
   if (!result) return null;
   const color = result.type === "five-face"    ? "#f5c518"
     : result.type === "spade-a-niu"            ? "#e040fb"
@@ -194,13 +280,14 @@ function Badge({ result }) {
       background:color, color:"#fff", padding:"3px 10px", borderRadius:14,
       fontSize:12, fontWeight:"bold", boxShadow:`0 2px 8px ${color}70`, letterSpacing:.5,
       display:"inline-block",
-    }}>{result.label}</span>
+    }}>{getLabel(result, lang)}</span>
   );
 }
 
 // ─── NPC Row ──────────────────────────────────────────────────────────────────
-function NpcRow({ name, hand, result, revealed, isDealer, winAmount }) {
+function NpcRow({ name, hand, result, revealed, isDealer, winAmount, lang = "zh" }) {
   const tripleSet = result?.tripleIdx ? new Set(result.tripleIdx) : new Set();
+  const tx = T[lang];
   return (
     <div style={{
       background:"rgba(255,255,255,0.03)",
@@ -210,7 +297,7 @@ function NpcRow({ name, hand, result, revealed, isDealer, winAmount }) {
     }}>
       <div style={{ minWidth:64 }}>
         <div style={{ fontSize:12, fontWeight:"bold", color: isDealer ? "#f5c518" : "#777" }}>
-          {isDealer ? "🏦 庄家" : `🤖 ${name}`}
+          {isDealer ? `🏦 ${tx.dealer}` : `🤖 ${name}`}
         </div>
       </div>
       <div style={{ display:"flex", gap:4, flex:1 }}>
@@ -221,10 +308,10 @@ function NpcRow({ name, hand, result, revealed, isDealer, winAmount }) {
         ))}
       </div>
       <div style={{ minWidth:96, textAlign:"right", display:"flex", flexDirection:"column", alignItems:"flex-end", gap:3 }}>
-        {revealed && result && <Badge result={result} />}
+        {revealed && result && <Badge result={result} lang={lang} />}
         {revealed && winAmount !== undefined && (
           <span style={{ fontSize:12, color: winAmount>0?"#2ecc71":winAmount<0?"#e74c3c":"#666" }}>
-            {winAmount>0?`+¥${winAmount}`:winAmount<0?`-¥${Math.abs(winAmount)}`:"平"}
+            {winAmount>0?`+RM${winAmount}`:winAmount<0?`-RM${Math.abs(winAmount)}`:tx.tiePayout}
           </span>
         )}
       </div>
@@ -234,6 +321,8 @@ function NpcRow({ name, hand, result, revealed, isDealer, winAmount }) {
 
 // ─── Main Game ────────────────────────────────────────────────────────────────
 export default function NiuNiuGame() {
+  const [lang, setLang] = useState("zh");
+  const tx = T[lang];
   const [coins, setCoins] = useState(INIT_COINS);
   const [bet, setBet] = useState(25);
   const [phase, setPhase] = useState("bet"); // bet | select | result
@@ -289,13 +378,12 @@ export default function NiuNiuGame() {
 
     let selected;
     if (isFiveFace) {
-      selected = { type:"five-face", value:15, label:"五花牛", tripleIdx:[] };
+      selected = { type:"five-face", value:15, tripleIdx:[] };
     } else if (declareNoNiu) {
-      // Player declares 没牛 — treat as no-niu regardless of actual hand
-      selected = { type:"no-niu", value:0, label:"没牛", tripleIdx:[] };
+      selected = { type:"no-niu", value:0, tripleIdx:[] };
     } else {
       if (selectedIdxs.length !== 3) {
-        setSelectionError("请选择3张牌来凑牛，或点「没牛」提交！");
+        setSelectionError(tx.errSelectThree);
         return;
       }
       selected = evalSelection(hands.player, selectedIdxs);
@@ -304,7 +392,7 @@ export default function NiuNiuGame() {
         setTimeout(() => setShake(false), 500);
         const vals = selectedIdxs.map(i => cardValue(hands.player[i].rank));
         const sum = vals.reduce((a,b)=>a+b,0);
-        setSelectionError(`❌ 选的3张点数之和为 ${sum}（个位 ${sum%10}），不是10的倍数，凑不了牛！请重新选择。`);
+        setSelectionError(tx.errInvalidCombo(sum));
         return;
       }
     }
@@ -322,8 +410,8 @@ export default function NiuNiuGame() {
     setTotalWon(prev => prev + actual);
 
     const diff = optimal - actual;
-    let log = actual > 0 ? `赢 ¥${actual}` : actual < 0 ? `输 ¥${Math.abs(actual)}` : "平局";
-    if (diff > 0) log += `（少赚/多亏 ¥${diff}）`;
+    let log = actual > 0 ? tx.logWon(actual) : actual < 0 ? tx.logLost(Math.abs(actual)) : tx.logTie;
+    if (diff > 0) log += tx.logMissed(diff);
     setRoundLog(prev => [log, ...prev].slice(0, 6));
     setPhase("result");
   }
@@ -362,13 +450,20 @@ export default function NiuNiuGame() {
       `}</style>
 
       {/* Header */}
-      <div style={{ textAlign:"center", marginBottom:18 }}>
+      <div style={{ textAlign:"center", marginBottom:18, position:"relative" }}>
         <div style={{
           fontSize:34, fontWeight:900, letterSpacing:8,
           background:"linear-gradient(90deg,#f5c518,#e74c3c,#f5c518)",
           WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent",
         }}>牛 牛</div>
         <div style={{ fontSize:11, color:"#445", letterSpacing:4, marginTop:1 }}>NIU NIU · POKER</div>
+        {/* Language toggle */}
+        <button onClick={() => setLang(l => l === "zh" ? "en" : "zh")} style={{
+          position:"absolute", top:0, right:0,
+          padding:"5px 12px", borderRadius:8, border:"1.5px solid rgba(255,255,255,0.15)",
+          background:"rgba(255,255,255,0.06)", color:"#aaa", fontSize:12,
+          cursor:"pointer", fontWeight:"bold", letterSpacing:1,
+        }}>{lang === "zh" ? "EN" : "中文"}</button>
       </div>
 
       {/* Stats Bar */}
@@ -378,19 +473,19 @@ export default function NiuNiuGame() {
         maxWidth:420, margin:"0 auto 16px",
       }}>
         <div style={{ textAlign:"center" }}>
-          <div style={{ fontSize:10, color:"#555", letterSpacing:1 }}>筹码</div>
-          <div style={{ fontSize:22, fontWeight:"bold", color: coins < 50 ? "#e74c3c" : "#f5c518" }}>¥{coins}</div>
+          <div style={{ fontSize:10, color:"#555", letterSpacing:1 }}>{tx.chips}</div>
+          <div style={{ fontSize:22, fontWeight:"bold", color: coins < 50 ? "#e74c3c" : "#f5c518" }}>RM{coins}</div>
         </div>
         <div style={{ textAlign:"center" }}>
-          <div style={{ fontSize:10, color:"#555", letterSpacing:1 }}>总盈亏</div>
+          <div style={{ fontSize:10, color:"#555", letterSpacing:1 }}>{tx.pl}</div>
           <div style={{ fontSize:22, fontWeight:"bold", color: totalWon >= 0 ? "#2ecc71" : "#e74c3c" }}>
-            {totalWon >= 0 ? "+" : ""}¥{totalWon}
+            {totalWon >= 0 ? "+" : ""}RM{totalWon}
           </div>
         </div>
         {phase !== "bet" && (
           <div style={{ textAlign:"center" }}>
-            <div style={{ fontSize:10, color:"#555", letterSpacing:1 }}>本局下注</div>
-            <div style={{ fontSize:22, fontWeight:"bold", color:"#aaa" }}>¥{bet}</div>
+            <div style={{ fontSize:10, color:"#555", letterSpacing:1 }}>{tx.currentBet}</div>
+            <div style={{ fontSize:22, fontWeight:"bold", color:"#aaa" }}>RM{bet}</div>
           </div>
         )}
       </div>
@@ -403,7 +498,7 @@ export default function NiuNiuGame() {
             background:"rgba(255,255,255,0.04)", border:"1.5px solid rgba(255,255,255,0.08)",
             borderRadius:20, padding:28, textAlign:"center",
           }}>
-            <div style={{ fontSize:15, color:"#aaa", marginBottom:16 }}>选择下注金额</div>
+            <div style={{ fontSize:15, color:"#aaa", marginBottom:16 }}>{tx.selectBet}</div>
             <div style={{ display:"flex", gap:10, justifyContent:"center", flexWrap:"wrap", marginBottom:24 }}>
               {BET_OPTIONS.map(b => (
                 <button key={b} onClick={() => setBet(b)} disabled={b > coins} style={{
@@ -412,7 +507,7 @@ export default function NiuNiuGame() {
                   border: bet === b ? "2px solid #f5c518" : "1.5px solid rgba(255,255,255,0.12)",
                   background: bet === b ? "rgba(245,197,24,0.15)" : "rgba(255,255,255,0.05)",
                   color: bet === b ? "#f5c518" : "#ccc", opacity: b > coins ? 0.4 : 1,
-                }}>¥{b}</button>
+                }}>RM{b}</button>
               ))}
             </div>
             <button onClick={startRound} disabled={bet > coins} style={{
@@ -420,18 +515,18 @@ export default function NiuNiuGame() {
               background:"linear-gradient(135deg,#f5c518,#e67e22)",
               color:"#1a1a2e", fontSize:18, fontWeight:900, cursor:"pointer",
               letterSpacing:2, boxShadow:"0 4px 20px rgba(245,197,24,0.4)",
-            }}>发牌！</button>
+            }}>{tx.deal}</button>
           </div>
         )}
 
         {/* ── NPC ROWS ── */}
         {phase !== "bet" && (
           <>
-            <NpcRow name="庄家" hand={hands.dealer} result={npcResults.dealer}
-              revealed={phase === "result"} isDealer />
+            <NpcRow name={tx.dealer} hand={hands.dealer} result={npcResults.dealer}
+              revealed={phase === "result"} isDealer lang={lang} />
             {["cpu1","cpu2","cpu3"].map((key, i) => (
-              <NpcRow key={key} name={`电脑${i+1}`} hand={hands[key]}
-                result={npcResults[key]} revealed={phase === "result"}
+              <NpcRow key={key} name={`${tx.cpu}${i+1}`} hand={hands[key]}
+                result={npcResults[key]} revealed={phase === "result"} lang={lang}
                 winAmount={phase === "result"
                   ? calcWin(npcResults[key]||{value:0,type:"no-niu"}, npcResults.dealer||{value:0,type:"no-niu"}, 25)
                   : undefined}
@@ -451,16 +546,16 @@ export default function NiuNiuGame() {
           }}>
             {/* Header row */}
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
-              <span style={{ fontSize:13, fontWeight:"bold", color:"#4fc3f7" }}>👤 你的手牌</span>
+              <span style={{ fontSize:13, fontWeight:"bold", color:"#4fc3f7" }}>👤 {tx.yourHand}</span>
               <span style={{ fontSize:12, color: selectedIdxs.length===3 ? "#2ecc71" : "#667" }}>
-                {phase === "select" && !isFiveFace ? `已选 ${selectedIdxs.length}/3 张` : ""}
+                {phase === "select" && !isFiveFace ? tx.selectedCount(selectedIdxs.length) : ""}
               </span>
             </div>
 
             {/* Five face notice */}
             {isFiveFace && phase === "select" && (
               <div style={{ fontSize:13, color:"#f5c518", marginBottom:10, textAlign:"center", fontWeight:"bold" }}>
-                🌟 五花牛！无需选牌，直接确认！
+                {tx.fiveFaceNotice}
               </div>
             )}
 
@@ -482,10 +577,10 @@ export default function NiuNiuGame() {
                 color: previewResult ? "#2ecc71" : selectedIdxs.length === 3 ? "#e74c3c" : "#778",
               }}>
                 {selectedIdxs.length < 3
-                  ? `当前点数和：${previewSum}（个位 ${previewSum % 10}）`
+                  ? tx.previewPartial(previewSum)
                   : previewResult
-                  ? `✅ 有效！组合为 ${previewResult.label}`
-                  : `❌ 点数和个位为 ${previewSum % 10}，不是0，无法凑牛`
+                  ? tx.previewValid(getLabel(previewResult, lang))
+                  : tx.previewInvalid(previewSum)
                 }
               </div>
             )}
@@ -512,7 +607,7 @@ export default function NiuNiuGame() {
                   boxShadow: (selectedIdxs.length === 3 || isFiveFace)
                     ? "0 4px 18px rgba(231,76,60,0.4)" : "none",
                   transition:"all 0.2s",
-                }}>确认开牌 👊</button>
+                }}>{tx.confirm}</button>
 
                 {!isFiveFace && (
                   <button onClick={() => confirmSelection(true)} style={{
@@ -521,7 +616,7 @@ export default function NiuNiuGame() {
                     background:"rgba(255,255,255,0.05)",
                     color:"#888", fontSize:15, fontWeight:"bold",
                     transition:"all 0.2s",
-                  }}>没牛 🐄</button>
+                  }}>{tx.noNiuBtn}</button>
                 )}
               </div>
             )}
@@ -534,9 +629,9 @@ export default function NiuNiuGame() {
                   textAlign:"center", fontSize:24, fontWeight:900, marginBottom:12,
                   color: winAmount > 0 ? "#2ecc71" : winAmount < 0 ? "#e74c3c" : "#aaa",
                 }}>
-                  {winAmount > 0 ? `🎉 赢了 ¥${winAmount}！`
-                   : winAmount < 0 ? `😞 输了 ¥${Math.abs(winAmount)}`
-                   : "🤝 平局"}
+                  {winAmount > 0 ? tx.won(winAmount)
+                   : winAmount < 0 ? tx.lost(Math.abs(winAmount))
+                   : tx.tie}
                 </div>
 
                 {/* ── Your selection vs Best comparison ── */}
@@ -550,7 +645,7 @@ export default function NiuNiuGame() {
                     {/* Player's selection */}
                     <div style={{ flex:1, minWidth:160 }}>
                       <div style={{ fontSize:11, color:"#667", marginBottom:6, letterSpacing:1 }}>
-                        👤 你的选择
+                        {tx.yourChoice}
                       </div>
                       <div style={{ display:"flex", gap:4, flexWrap:"wrap" }}>
                         {hands.player.map((card, i) => {
@@ -565,9 +660,9 @@ export default function NiuNiuGame() {
                         })}
                       </div>
                       <div style={{ marginTop:8, display:"flex", alignItems:"center", gap:6 }}>
-                        <Badge result={playerResult} />
+                        <Badge result={playerResult} lang={lang} />
                         <span style={{ fontSize:12, color: winAmount > 0 ? "#2ecc71" : winAmount < 0 ? "#e74c3c" : "#888" }}>
-                          {winAmount > 0 ? `+¥${winAmount}` : winAmount < 0 ? `-¥${Math.abs(winAmount)}` : "平"}
+                          {winAmount > 0 ? `+RM${winAmount}` : winAmount < 0 ? `-RM${Math.abs(winAmount)}` : tx.tiePayout}
                         </span>
                       </div>
                     </div>
@@ -583,7 +678,7 @@ export default function NiuNiuGame() {
                       <div style={{ fontSize:11, marginBottom:6, letterSpacing:1,
                         color: isSuboptimal ? "#f5c518" : "#2ecc71",
                       }}>
-                        {isSuboptimal ? "💡 最佳组合" : "✅ 最佳组合"}
+                        {tx.bestComboLabel(isSuboptimal)}
                       </div>
                       <div style={{ display:"flex", gap:4, flexWrap:"wrap" }}>
                         {hands.player.map((card, i) => {
@@ -597,9 +692,9 @@ export default function NiuNiuGame() {
                         })}
                       </div>
                       <div style={{ marginTop:8, display:"flex", alignItems:"center", gap:6 }}>
-                        <Badge result={bestResult} />
+                        <Badge result={bestResult} lang={lang} />
                         <span style={{ fontSize:12, color: bestWinAmount > 0 ? "#2ecc71" : bestWinAmount < 0 ? "#e74c3c" : "#888" }}>
-                          {bestWinAmount > 0 ? `+¥${bestWinAmount}` : bestWinAmount < 0 ? `-¥${Math.abs(bestWinAmount)}` : "平"}
+                          {bestWinAmount > 0 ? `+RM${bestWinAmount}` : bestWinAmount < 0 ? `-RM${Math.abs(bestWinAmount)}` : tx.tiePayout}
                         </span>
                       </div>
                     </div>
@@ -612,8 +707,7 @@ export default function NiuNiuGame() {
                       borderTop:"1px solid rgba(245,197,24,0.15)",
                       fontSize:12, color:"#aaa", textAlign:"center",
                     }}>
-                      最佳组合比你的选择{" "}
-                      <span style={{ color:"#e74c3c", fontWeight:"bold" }}>多 ¥{diff}</span>
+                      <span style={{ color:"#e74c3c", fontWeight:"bold" }}>{tx.suboptimalNote(diff)}</span>
                     </div>
                   )}
                   {!isSuboptimal && (
@@ -622,15 +716,15 @@ export default function NiuNiuGame() {
                       borderTop:"1px solid rgba(46,204,113,0.15)",
                       fontSize:12, color:"#2ecc71", textAlign:"center", fontWeight:"bold",
                     }}>
-                      🎯 恭喜！你选了最佳组合！
+                      {tx.optimalNote}
                     </div>
                   )}
                 </div>
 
                 {/* Dealer comparison line */}
                 <div style={{ fontSize:12, color:"#556", textAlign:"center", marginBottom:12 }}>
-                  庄家：<Badge result={npcResults.dealer} />
-                  &nbsp;×{Math.max(multiplierFull(playerResult), multiplierFull(npcResults.dealer))}倍
+                  {tx.dealerPrefix}<Badge result={npcResults.dealer} lang={lang} />
+                  &nbsp;{tx.times(Math.max(multiplierFull(playerResult), multiplierFull(npcResults.dealer)))}
                 </div>
 
                 <div style={{ display:"flex", gap:10, justifyContent:"center" }}>
@@ -638,13 +732,13 @@ export default function NiuNiuGame() {
                     padding:"11px 32px", borderRadius:10, border:"none",
                     background:"linear-gradient(135deg,#f5c518,#e67e22)",
                     color:"#1a1a2e", fontSize:15, fontWeight:900, cursor:"pointer",
-                  }}>再来一局</button>
+                  }}>{tx.playAgain}</button>
                   {coins <= 0 && (
                     <button onClick={() => { setCoins(INIT_COINS); setTotalWon(0); setPhase("bet"); }} style={{
                       padding:"11px 32px", borderRadius:10,
                       border:"1.5px solid rgba(255,255,255,0.15)",
                       background:"transparent", color:"#aaa", fontSize:15, cursor:"pointer",
-                    }}>重置筹码</button>
+                    }}>{tx.resetChips}</button>
                   )}
                 </div>
               </div>
@@ -658,7 +752,7 @@ export default function NiuNiuGame() {
             background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.05)",
             borderRadius:10, padding:"10px 16px",
           }}>
-            <div style={{ fontSize:10, color:"#445", marginBottom:5, letterSpacing:1 }}>历史记录</div>
+            <div style={{ fontSize:10, color:"#445", marginBottom:5, letterSpacing:1 }}>{tx.history}</div>
             {roundLog.map((log, i) => (
               <div key={i} style={{ fontSize:12, color: i===0?"#999":"#445", marginBottom:2 }}>{log}</div>
             ))}
@@ -670,11 +764,10 @@ export default function NiuNiuGame() {
           background:"rgba(255,255,255,0.02)", borderRadius:10,
           padding:"10px 16px", fontSize:11, color:"#445", lineHeight:2,
         }}>
-          <span style={{ color:"#666" }}>玩法：</span>点击选3张牌使点数之和为10的倍数 → 剩余2张个位即牛数。
-          牛7+/牛牛 ×2，五花牛 ×3。
-          <span style={{ color:"#8e44ad" }}> 🎯 对子牛 ×3。</span>
-          <span style={{ color:"#e040fb" }}> ♠A 凑牛含JQK → ×5；♠A+对子牛 → ×4。</span>
-          <span style={{ color:"#1abc9c" }}> ★ 凑牛时3↔6可互换（对子牛除外）。</span>
+          {tx.rules}
+          <span style={{ color:"#8e44ad" }}> {tx.rulesPair}</span>
+          <span style={{ color:"#e040fb" }}> {tx.rulesSpade}</span>
+          <span style={{ color:"#1abc9c" }}> {tx.rulesSwap}</span>
         </div>
       </div>
     </div>
