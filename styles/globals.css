@@ -5,21 +5,21 @@
 }
 
 :root {
-  --bg: #08111f;
-  --bg-2: #101d33;
-  --panel: rgba(15, 25, 45, 0.78);
-  --panel-strong: rgba(18, 31, 56, 0.96);
+  --bg: #071510;
+  --bg-2: #0d241b;
+  --panel: rgba(9, 33, 24, 0.82);
+  --panel-strong: rgba(11, 40, 29, 0.96);
   --panel-soft: rgba(255, 255, 255, 0.05);
-  --line: rgba(255, 255, 255, 0.1);
-  --line-strong: rgba(255, 255, 255, 0.16);
-  --text: #ecf3ff;
-  --muted: #92a4c5;
-  --blue: #5aa7ff;
-  --cyan: #7ce8ff;
-  --gold: #ffd166;
-  --green: #38d996;
-  --red: #ff6b81;
-  --shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+  --line: rgba(185, 255, 226, 0.1);
+  --line-strong: rgba(185, 255, 226, 0.18);
+  --text: #eefbf4;
+  --muted: #9bbcad;
+  --blue: #4bd1a0;
+  --cyan: #80f0c8;
+  --gold: #f3d27a;
+  --green: #59e3a7;
+  --red: #ff7c8f;
+  --shadow: 0 20px 45px rgba(0, 0, 0, 0.38);
 }
 
 html,
@@ -30,9 +30,9 @@ body,
 
 body {
   background:
-    radial-gradient(circle at top, rgba(90, 167, 255, 0.22), transparent 30%),
-    radial-gradient(circle at 20% 20%, rgba(124, 232, 255, 0.12), transparent 20%),
-    linear-gradient(180deg, #0a1324 0%, #08111f 40%, #060d18 100%);
+    radial-gradient(circle at top, rgba(75, 209, 160, 0.2), transparent 32%),
+    radial-gradient(circle at 20% 20%, rgba(128, 240, 200, 0.1), transparent 22%),
+    linear-gradient(180deg, #0b1d16 0%, #071510 45%, #040b08 100%);
   color: var(--text);
   font-family: Inter, "Noto Sans SC", "PingFang SC", sans-serif;
 }
@@ -62,8 +62,8 @@ button {
 .niuniu-hero {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(90, 167, 255, 0.2), rgba(124, 232, 255, 0.08));
-  border: 1px solid rgba(124, 232, 255, 0.14);
+  background: linear-gradient(135deg, rgba(75, 209, 160, 0.18), rgba(243, 210, 122, 0.08));
+  border: 1px solid rgba(128, 240, 200, 0.14);
   border-radius: 28px;
   padding: 22px 20px 18px;
   box-shadow: var(--shadow);
@@ -81,7 +81,7 @@ button {
 .niuniu-hero::before {
   width: 180px;
   height: 180px;
-  background: rgba(124, 232, 255, 0.09);
+  background: rgba(89, 227, 167, 0.1);
   top: -80px;
   right: -40px;
 }
@@ -89,7 +89,7 @@ button {
 .niuniu-hero::after {
   width: 120px;
   height: 120px;
-  background: rgba(255, 209, 102, 0.08);
+  background: rgba(243, 210, 122, 0.1);
   bottom: -45px;
   left: -25px;
 }
@@ -137,8 +137,8 @@ button {
 }
 
 .lang-switch {
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(8, 17, 31, 0.5);
+  border: 1px solid rgba(185, 255, 226, 0.14);
+  background: rgba(6, 18, 13, 0.55);
   color: var(--text);
   border-radius: 999px;
   padding: 8px 14px;
@@ -157,8 +157,8 @@ button {
 }
 
 .stat-card {
-  background: rgba(8, 17, 31, 0.42);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(6, 18, 13, 0.44);
+  border: 1px solid rgba(185, 255, 226, 0.08);
   border-radius: 18px;
   padding: 12px 14px;
   min-height: 86px;
@@ -245,8 +245,8 @@ button {
 }
 
 .bet-chip.active {
-  border-color: rgba(255, 209, 102, 0.65);
-  background: rgba(255, 209, 102, 0.16);
+  border-color: rgba(243, 210, 122, 0.65);
+  background: rgba(243, 210, 122, 0.16);
   color: var(--gold);
   transform: translateY(-1px);
 }
@@ -270,21 +270,21 @@ button {
 
 .primary-btn {
   width: 100%;
-  background: linear-gradient(135deg, #5aa7ff 0%, #7ce8ff 100%);
-  color: #07111f;
-  box-shadow: 0 16px 24px rgba(90, 167, 255, 0.28);
+  background: linear-gradient(135deg, #4bd1a0 0%, #80f0c8 100%);
+  color: #062016;
+  box-shadow: 0 16px 24px rgba(75, 209, 160, 0.28);
 }
 
 .secondary-btn {
-  background: linear-gradient(135deg, #ff7a8f 0%, #ff9569 100%);
-  color: #fff;
-  box-shadow: 0 14px 22px rgba(255, 107, 129, 0.28);
+  background: linear-gradient(135deg, #d8b35f 0%, #f3d27a 100%);
+  color: #1c1606;
+  box-shadow: 0 14px 22px rgba(243, 210, 122, 0.24);
 }
 
 .ghost-btn {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.04);
   color: var(--muted);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(185, 255, 226, 0.1);
 }
 
 .primary-btn:hover,
@@ -312,7 +312,7 @@ button {
 }
 
 .npc-row.dealer {
-  border-color: rgba(255, 209, 102, 0.2);
+  border-color: rgba(243, 210, 122, 0.22);
 }
 
 .npc-meta {
@@ -346,8 +346,8 @@ button {
 }
 
 .player-panel {
-  background: linear-gradient(180deg, rgba(90, 167, 255, 0.08), rgba(124, 232, 255, 0.04));
-  border: 1px solid rgba(124, 232, 255, 0.18);
+  background: linear-gradient(180deg, rgba(75, 209, 160, 0.1), rgba(128, 240, 200, 0.05));
+  border: 1px solid rgba(128, 240, 200, 0.16);
 }
 
 .player-panel.shake {
@@ -379,14 +379,14 @@ button {
 }
 
 .notice-box {
-  background: rgba(255, 209, 102, 0.1);
-  border: 1px solid rgba(255, 209, 102, 0.16);
+  background: rgba(243, 210, 122, 0.1);
+  border: 1px solid rgba(243, 210, 122, 0.16);
   color: var(--gold);
 }
 
 .error-box {
-  background: rgba(255, 107, 129, 0.1);
-  border: 1px solid rgba(255, 107, 129, 0.2);
+  background: rgba(255, 124, 143, 0.1);
+  border: 1px solid rgba(255, 124, 143, 0.2);
   color: var(--red);
 }
 
@@ -422,14 +422,14 @@ button {
 }
 
 .compare-box {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(185, 255, 226, 0.08);
   margin-bottom: 12px;
 }
 
 .compare-box.suboptimal {
-  background: rgba(255, 209, 102, 0.08);
-  border-color: rgba(255, 209, 102, 0.18);
+  background: rgba(243, 210, 122, 0.08);
+  border-color: rgba(243, 210, 122, 0.18);
 }
 
 .compare-grid {
@@ -472,12 +472,12 @@ button {
 
 .compare-footer.good {
   color: var(--green);
-  border-top-color: rgba(56, 217, 150, 0.16);
+  border-top-color: rgba(89, 227, 167, 0.18);
 }
 
 .compare-footer.warn {
   color: var(--gold);
-  border-top-color: rgba(255, 209, 102, 0.16);
+  border-top-color: rgba(243, 210, 122, 0.18);
 }
 
 .muted-line {
@@ -489,8 +489,8 @@ button {
 
 .history-box,
 .rules-box {
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(185, 255, 226, 0.08);
 }
 
 .log-item {
